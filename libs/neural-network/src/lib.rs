@@ -1,6 +1,7 @@
 use rand::{thread_rng, Rng, RngCore};
 use std::ops::Add;
 
+// TODO: Upgrade to matrices
 pub struct Network {
     layers: Vec<Layer>,
 }

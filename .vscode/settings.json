@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
-        "bindgen"
+        "bindgen",
+        "coeff",
+        "consts",
+        "nalgebra"
     ]
 }

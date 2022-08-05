@@ -27,7 +27,7 @@ impl Simulation {
     }
 
     pub fn step(&mut self) {
-        self.sim.step()
+        self.sim.step(&mut self.rng)
     }
 }
 
@@ -44,8 +44,8 @@ pub struct Animal {
     pub rotation: f32,
 }
 
-impl From<&sim::World> for World {
-    fn from(world: &sim::World) -> Self {
+impl From<&sim::world::World> for World {
+    fn from(world: &sim::world::World) -> Self {
         let animals = world.animals().iter().map(Animal::from).collect();
 
         let food = world.foods().iter().map(Food::from).collect();
@@ -54,8 +54,8 @@ impl From<&sim::World> for World {
     }
 }
 
-impl From<&sim::Animal> for Animal {
-    fn from(animal: &sim::Animal) -> Self {
+impl From<&sim::animal::Animal> for Animal {
+    fn from(animal: &sim::animal::Animal) -> Self {
         Self {
             x: animal.position().x,
             y: animal.position().y,
@@ -70,8 +70,8 @@ pub struct Food {
     pub y: f32,
 }
 
-impl From<&sim::Food> for Food {
-    fn from(food: &sim::Food) -> Self {
+impl From<&sim::food::Food> for Food {
+    fn from(food: &sim::food::Food) -> Self {
         Self {
             x: food.position().x,
             y: food.position().y,

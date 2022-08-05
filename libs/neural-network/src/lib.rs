@@ -1,4 +1,4 @@
-use rand::{thread_rng, Rng};
+use rand::{thread_rng, Rng, RngCore};
 use std::ops::Add;
 
 pub struct Network {
@@ -21,9 +21,10 @@ struct Neuron {
 impl Network {
     pub fn random(layers: &Vec<LayerTopology>) -> Self {
         assert!(layers.len() > 1);
+        let mut rng = thread_rng();
         let layers = layers
             .windows(2)
-            .map(|layers| Layer::random(layers[0].neurons, layers[1].neurons))
+            .map(|layers| Layer::random(layers[0].neurons, layers[1].neurons, &mut rng))
             .collect();
 
         Self { layers }
@@ -37,9 +38,9 @@ impl Network {
 }
 
 impl Layer {
-    fn random(input_neurons: usize, output_neurons: usize) -> Self {
+    fn random(input_neurons: usize, output_neurons: usize, rng: &mut dyn RngCore) -> Self {
         let neurons = (0..output_neurons)
-            .map(|_| Neuron::random(input_neurons))
+            .map(|_| Neuron::random(input_neurons, rng))
             .collect();
         Self { neurons }
     }
@@ -53,9 +54,7 @@ impl Layer {
 }
 
 impl Neuron {
-    fn random(neurons: usize) -> Self {
-        let mut rng = thread_rng();
-
+    fn random(neurons: usize, rng: &mut dyn RngCore) -> Self {
         let bias = rng.gen_range(-1.0..=1.0);
 
         let weights = (0..neurons).map(|_| rng.gen_range(-1.0..1.0)).collect();

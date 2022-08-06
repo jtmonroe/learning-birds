@@ -7,7 +7,8 @@ pub struct World {
 }
 
 // TODO: implement better distribution
-// TODO: Add parameter for the number of animals and foods
+// TODO: Add parameters for the number of animals and foods
+// TODO: 100% coverage
 impl World {
     pub fn random(rng: &mut dyn RngCore) -> Self {
         let animals = (0..40).map(|_| Animal::random(rng)).collect();

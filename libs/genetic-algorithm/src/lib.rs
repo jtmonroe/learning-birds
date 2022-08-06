@@ -1,6 +1,16 @@
 #![feature(type_alias_impl_trait)]
 
-use rand::{prelude::SliceRandom, Rng, RngCore};
+pub mod selection_method;
+use log::warn;
+use mutation_method::MutationMethod;
+use selection_method::SelectionMethod;
+
+pub mod crossover_method;
+use crossover_method::CrossoverMethod;
+
+pub mod mutation_method;
+
+use rand::{Rng, RngCore};
 use std::ops::Index;
 // TODO: Upgrade to Matrices
 
@@ -36,11 +46,25 @@ where
         assert!(!population.is_empty());
         (0..population.len())
             .map(|_| {
-                let parent_a = self.selection_method.select(rng, population).chromosome();
-                let parent_b = self.selection_method.select(rng, population).chromosome();
+                let parent_a = match self.selection_method.select(rng, population) {
+                    Ok(i) => i.chromosome(),
+                    Err(e) => {
+                        warn!("{}", e);
+                        population[0].chromosome()
+                    }
+                };
+                let parent_b = match self.selection_method.select(rng, population) {
+                    Ok(i) => i.chromosome(),
+                    Err(e) => {
+                        warn!("{}", e);
+                        population[1].chromosome()
+                    }
+                };
+
                 let mut child = self.crossover_method.crossover(rng, parent_a, parent_b);
+
                 self.mutation_method.mutate(rng, &mut child);
-                I::from_chromosome(&child)
+                I::from_chromosome(child)
             })
             .collect()
     }
@@ -49,27 +73,7 @@ where
 pub trait Individual {
     fn fitness(&self) -> f32;
     fn chromosome(&self) -> &Chromosome;
-    fn from_chromosome(chromosome: &Chromosome) -> Self;
-}
-
-pub trait SelectionMethod {
-    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I]) -> &'a I
-    where
-        I: Individual;
-}
-
-#[derive(Clone, Debug)]
-pub struct RouletteWheelSelection;
-
-impl SelectionMethod for RouletteWheelSelection {
-    fn select<'a, I>(&self, rng: &mut dyn RngCore, population: &'a [I]) -> &'a I
-    where
-        I: Individual,
-    {
-        population
-            .choose_weighted(rng, |individual| individual.fitness())
-            .expect("got an empty population")
-    }
+    fn from_chromosome(chromosome: Chromosome) -> Self;
 }
 
 pub struct Chromosome {
@@ -112,66 +116,5 @@ impl IntoIterator for Chromosome {
 
     fn into_iter(self) -> Self::IntoIter {
         self.genes.into_iter()
-    }
-}
-
-pub trait CrossoverMethod {
-    fn crossover(
-        &self,
-        rng: &mut dyn RngCore,
-        parent_a: &Chromosome,
-        parent_b: &Chromosome,
-    ) -> Chromosome;
-}
-
-#[derive(Clone, Debug)]
-pub struct UniformCrossover;
-
-impl UniformCrossover {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-impl CrossoverMethod for UniformCrossover {
-    fn crossover(
-        &self,
-        rng: &mut dyn RngCore,
-        parent_a: &Chromosome,
-        parent_b: &Chromosome,
-    ) -> Chromosome {
-        let genes = parent_a
-            .iter()
-            .zip(parent_b.iter())
-            .map(|(&a, &b)| if rng.gen_bool(0.5) { a } else { b })
-            .collect();
-        return Chromosome { genes };
-    }
-}
-
-pub trait MutationMethod {
-    fn mutate(&self, rng: &mut dyn RngCore, child: &mut Chromosome);
-}
-
-pub struct GaussianMutation {
-    chance: f32,
-    coeff: f32,
-}
-
-impl GaussianMutation {
-    pub fn new(chance: f32, coeff: f32) -> Self {
-        assert!((0.0..=1.0).contains(&chance));
-        Self { chance, coeff }
-    }
-}
-
-impl MutationMethod for GaussianMutation {
-    fn mutate(&self, rng: &mut dyn RngCore, child: &mut Chromosome) {
-        child.iter_mut().for_each(|gene| {
-            let sign = if rng.gen_bool(0.5) { -1.0 } else { 1.0 };
-            if rng.gen_bool(self.chance as _) {
-                *gene = sign * self.coeff * rng.gen::<f32>()
-            }
-        })
     }
 }

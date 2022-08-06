@@ -13,6 +13,7 @@ pub struct Eye {
     cells: usize,
 }
 
+// TODO: 100% Test Coverage
 impl Eye {
     pub fn new(fov_range: f32, fov_angle: f32, cells: usize) -> Self {
         assert!(fov_range > 0.0);
@@ -36,7 +37,35 @@ impl Eye {
         rotation: na::Rotation2<f32>,
         foods: &[Food],
     ) -> Vec<f32> {
-        todo!()
+        let mut cells = vec![0.0; self.cells];
+
+        for food in foods{
+            let vec: na::Vector2<f32> = food.position - position;
+            let distance = vec.norm();
+            
+            if distance >= self.fov_range {
+                continue;
+            }
+
+            let angle = na::Rotation2::rotation_between(
+                &na::Vector2::x(), 
+                &vec
+            ).angle() - rotation.angle(); 
+
+            let angle = na::wrap(angle, -PI, PI);
+
+            if angle < -self.fov_angle / 2.0 || angle > self.fov_angle / 2.0 {
+                continue;
+            }
+
+            let cell = (angle + self.fov_angle / 2.0) / self.fov_angle;
+            let cell = cell * (self.cells as f32);
+            let cell = (cell as usize).min(cells.len() - 1);
+
+            let energy = (self.fov_range - distance) / self.fov_range;
+            cells[cell] = energy;
+        };
+        cells
     }
 }
 

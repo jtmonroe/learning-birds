@@ -1,13 +1,22 @@
 {
   "name": "vite-template-solid",
-  "version": "0.0.0",
-  "description": "",
+  "author": "Joel Monroe",
+  "version": "0.0.3",
+  "description": "A Simple App to show Rust WebAssembly",
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
   },
+  "keywords": [
+    "webassembly",
+    "wasm",
+    "rust",
+    "webpack",
+    "neural-network",
+    "genetic algorithm"
+  ],
   "license": "MIT",
   "devDependencies": {
     "lib-simulation-wasm": "file:../libs/simulation-wasm/pkg",

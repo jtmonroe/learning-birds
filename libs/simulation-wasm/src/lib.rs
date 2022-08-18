@@ -21,7 +21,7 @@ pub struct Simulation {
 impl Simulation {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        let _ = Timer::new("Simulation::new");
+        // let _ = Timer::new("Simulation::new");
         wasm_logger::init(wasm_logger::Config::new(log::Level::Warn));
         std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
@@ -40,7 +40,7 @@ impl Simulation {
     }
 
     pub fn step(&mut self) {
-        let _ = Timer::new("Simulation::step");
+        // let _ = Timer::new("Simulation::step");
         self.sim.step(&mut self.rng)
     }
 }

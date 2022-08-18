@@ -1,62 +1,41 @@
 import * as sim from 'lib-simulation-wasm';
 
 
-export class Sim {
+export class SimDrawer {
     private simulation = new sim.Simulation();
-    private context: CanvasRenderingContext2D;
-    private viewportWidth: number;
-    private viewportHeight: number;
-    private canvas: HTMLCanvasElement;
 
-    constructor(canvas: HTMLCanvasElement) {
-        this.canvas = canvas;
-        this.viewportWidth = canvas.clientWidth;
-        this.viewportHeight = canvas.clientHeight;
-
-        let viewportScale = window.devicePixelRatio || 1;
-        canvas.width = this.viewportWidth * viewportScale;
-        canvas.height = this.viewportHeight * viewportScale;
-
-        this.context = canvas.getContext('2d')!;
-        this.context.fillStyle = 'rgb(0, 0, 0)';
+    age(): number {
+        return this.simulation.age();
     }
 
-    redraw() {
-        this.context.clearRect(0, 0, this.viewportWidth, this.viewportHeight);
-
+    redraw(canvasContext: CanvasRenderingContext2D, viewportHeight: number, viewportWidth: number) {
+        console.log("redraw");
+        canvasContext.clearRect(0, 0, viewportWidth, viewportHeight);
         this.simulation.step();
-    
+
         const world = this.simulation.world();
-    
+
         for (const food of world.food) {
             drawCircle(
-                this.context,
-                food.x * this.viewportWidth,
-                food.y * this.viewportHeight,
-                (0.01 / 2.0) * this.viewportWidth
+                canvasContext,
+                food.x * viewportWidth,
+                food.y * viewportHeight,
+                (0.01 / 2.0) * viewportWidth
             );
         }
-    
+
         for (const animal of world.animals) {
             drawTriangle(
-                this.context,
-                animal.x * this.viewportWidth,
-                animal.y * this.viewportHeight,
-                0.01 * this.viewportWidth,
+                canvasContext,
+                animal.x * viewportWidth,
+                animal.y * viewportHeight,
+                0.01 * viewportWidth,
                 animal.rotation
             );
         }
+
     }
 
-    Animate = () => {
-        this.redraw();
-        requestAnimationFrame(this.Animate);
-    }
-
-    public animate(): HTMLCanvasElement {
-        this.Animate();
-        return this.canvas;
-    }
 
 }
 

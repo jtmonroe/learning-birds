@@ -1,22 +1,19 @@
 {
-  "name": "bird-app",
-  "author": "Joel Monroe",
+  "name": "vite-template-solid",
+<<<<<<< HEAD:app/package.json
+  "author": "Joel Monroe <jtmonroe@proton.me>",
   "version": "0.0.3",
   "description": "A Simple App to show Rust WebAssembly",
+=======
+  "version": "0.0.0",
+  "description": "",
+>>>>>>> parent of 514d88d (- functional page):solid/package.json
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "(cd ../libs/simulation-wasm/ && wasm-pack build --target web) && vite build",
     "serve": "vite preview"
   },
-  "keywords": [
-    "webassembly",
-    "wasm",
-    "rust",
-    "webpack",
-    "neural-network",
-    "genetic algorithm"
-  ],
   "license": "MIT",
   "devDependencies": {
     "lib-simulation-wasm": "file:../libs/simulation-wasm/pkg",

@@ -7,9 +7,6 @@ export default defineConfig({
   plugins: [solidPlugin(), wasm()],
   server: {
     port: 3000,
-    fs: {
-      allow: ['..'],
-    }
   },
   build: {
     target: 'esnext',

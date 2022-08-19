@@ -1,43 +1,77 @@
-import init, {Simulation} from 'lib-simulation-wasm';
+import init, { Simulation } from 'lib-simulation-wasm';
 
 await init();
 
+<<<<<<< HEAD:app/src/SimDrawer.tsx
 export class SimDrawer {
     private simulation = new Simulation();
 
-    age(): number {
-        return this.simulation.age();
-    }
+    age = (): number => this.simulation.age();
 
     redraw(canvasContext: CanvasRenderingContext2D, viewportHeight: number, viewportWidth: number) {
-        console.log("redraw");
         canvasContext.clearRect(0, 0, viewportWidth, viewportHeight);
+=======
+export class Sim {
+    private simulation = new sim.Simulation();
+    private context: CanvasRenderingContext2D;
+    private viewportWidth: number;
+    private viewportHeight: number;
+    private canvas: HTMLCanvasElement;
+
+    constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+        this.viewportWidth = canvas.clientWidth;
+        this.viewportHeight = canvas.clientHeight;
+
+        let viewportScale = window.devicePixelRatio || 1;
+        canvas.width = this.viewportWidth * viewportScale;
+        canvas.height = this.viewportHeight * viewportScale;
+
+        this.context = canvas.getContext('2d')!;
+        this.context.fillStyle = 'rgb(0, 0, 0)';
+    }
+
+    redraw() {
+        this.context.clearRect(0, 0, this.viewportWidth, this.viewportHeight);
+
+>>>>>>> parent of 514d88d (- functional page):solid/src/Sim.tsx
         this.simulation.step();
-
+    
         const world = this.simulation.world();
-
+    
         for (const food of world.food) {
             drawCircle(
-                canvasContext,
-                food.x * viewportWidth,
-                food.y * viewportHeight,
-                (0.01 / 2.0) * viewportWidth
+                this.context,
+                food.x * this.viewportWidth,
+                food.y * this.viewportHeight,
+                (0.01 / 2.0) * this.viewportWidth
             );
         }
-
+    
         for (const animal of world.animals) {
             drawTriangle(
-                canvasContext,
-                animal.x * viewportWidth,
-                animal.y * viewportHeight,
-                0.01 * viewportWidth,
+                this.context,
+                animal.x * this.viewportWidth,
+                animal.y * this.viewportHeight,
+                0.01 * this.viewportWidth,
                 animal.rotation
             );
         }
+    }
+<<<<<<< HEAD:app/src/SimDrawer.tsx
+=======
 
+    Animate = () => {
+        this.redraw();
+        requestAnimationFrame(this.Animate);
     }
 
+    public animate(): HTMLCanvasElement {
+        this.Animate();
+        return this.canvas;
+    }
 
+>>>>>>> parent of 514d88d (- functional page):solid/src/Sim.tsx
 }
 
 function drawTriangle(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number) {

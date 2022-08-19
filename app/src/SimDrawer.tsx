@@ -1,4 +1,4 @@
-import init, {Simulation} from 'lib-simulation-wasm';
+import init, { Simulation } from 'lib-simulation-wasm';
 
 await init();
 
@@ -9,8 +9,19 @@ export class SimDrawer {
         return this.simulation.age();
     }
 
+    average_fitness(): number {
+        return this.simulation.average_fitness();
+    }
+
+    current_generation(): number {
+        return this.simulation.current_generation();
+    }
+
+    previous_fitness(): number {
+        return this.simulation.previous_fitness();
+    }
+
     redraw(canvasContext: CanvasRenderingContext2D, viewportHeight: number, viewportWidth: number) {
-        console.log("redraw");
         canvasContext.clearRect(0, 0, viewportWidth, viewportHeight);
         this.simulation.step();
 
@@ -36,7 +47,6 @@ export class SimDrawer {
         }
 
     }
-
 
 }
 

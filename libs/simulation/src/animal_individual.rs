@@ -1,7 +1,7 @@
 use crate::*;
 
 pub struct AnimalIndividual {
-    fitness: f32,
+    pub fitness: f32,
     chromosome: ga::Chromosome,
 }
 

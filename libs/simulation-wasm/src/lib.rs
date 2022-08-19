@@ -39,6 +39,19 @@ impl Simulation {
         self.sim.age
     }
 
+    pub fn current_generation(&self) -> usize {
+        self.sim.current_generation
+    }
+
+    pub fn average_fitness(&self) -> f32 {
+        self.sim.average_fitness()
+    }
+
+    pub fn previous_fitness(&self) -> f32 {
+        self.sim.previous_fitness
+    }
+
+
     pub fn step(&mut self) {
         // let _ = Timer::new("Simulation::step");
         self.sim.step(&mut self.rng)

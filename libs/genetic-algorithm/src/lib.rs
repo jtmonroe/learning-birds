@@ -12,7 +12,6 @@ pub mod mutation_method;
 
 use rand::{Rng, RngCore};
 use std::ops::Index;
-// TODO: Upgrade to Matrices
 
 pub struct GeneticAlgorithm<S, C, M>
 where

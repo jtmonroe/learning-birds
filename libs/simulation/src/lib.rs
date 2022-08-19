@@ -3,6 +3,7 @@ use log::info;
 use nalgebra as na;
 use rand::{Rng, RngCore};
 use std::f32::consts::FRAC_PI_2;
+use std::ops::Div;
 
 pub mod animal;
 mod animal_individual;
@@ -27,8 +28,11 @@ const GENERATION_LENGTH: usize = 1000;
 
 pub struct Simulation {
     world: World,
-    ga: ga::GeneticAlgorithm<RouletteWheelSelection, UniformCrossover, GaussianMutation>,
+    genetic_algorithm: ga::GeneticAlgorithm<RouletteWheelSelection, UniformCrossover, GaussianMutation>,
     pub age: usize,
+    pub generation_length: usize,
+    pub current_generation: usize,
+    pub previous_fitness: f32
 }
 
 const EPSILON: f32 = 0.01;
@@ -43,8 +47,11 @@ impl Simulation {
 
         Self {
             world: World::random(rng),
-            ga,
+            genetic_algorithm: ga,
             age: 0,
+            generation_length: GENERATION_LENGTH,
+            current_generation: 0,
+            previous_fitness: 0.0
         }
     }
 
@@ -60,15 +67,27 @@ impl Simulation {
         self.process_movements();
         self.age += 1;
 
-        if self.age > GENERATION_LENGTH {
+        if self.age > self.generation_length {
             info!("Old Generation aging out. New Generation Evolving.");
             self.evolve(rng);
         }
     }
 
-    // TODO: 
+    pub fn average_fitness(&self) -> f32 {
+        self.world
+            .animals
+            .iter()
+            .map(AnimalIndividual::from_animal)
+            .map(|it| it.fitness)
+            .sum::<f32>()
+            .div(self.world.animals.len() as f32)
+    }
+
     fn evolve(&mut self, rng: &mut dyn RngCore) {
         self.age = 0;
+        self.current_generation += 1;
+        self.previous_fitness = self.average_fitness();
+
         let current_population: Vec<_> = self
             .world
             .animals
@@ -76,7 +95,7 @@ impl Simulation {
             .map(AnimalIndividual::from_animal)
             .collect();
 
-        let evolved_population = self.ga.evolve(rng, &current_population);
+        let evolved_population = self.genetic_algorithm.evolve(rng, &current_population);
 
         self.world.animals = evolved_population
             .into_iter()

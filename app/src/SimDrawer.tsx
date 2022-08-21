@@ -3,23 +3,24 @@ import init, { Simulation } from 'lib-simulation-wasm';
 await init();
 
 export class SimDrawer {
-    private simulation = new Simulation();
+    private simulation: Simulation;
+    private bird_color: string;
+    private food_color: string;
 
-    age(): number {
-        return this.simulation.age();
+    constructor(
+        previous_fitness_id: string,
+        generation_id: string,
+        bird_color: string,
+        food_color: string
+    ) {
+        this.simulation = new Simulation(generation_id, previous_fitness_id)
+        this.bird_color = bird_color;
+        this.food_color = food_color;
     }
 
-    average_fitness(): number {
-        return this.simulation.average_fitness();
-    }
+    age = (): number => this.simulation.age();
 
-    current_generation(): number {
-        return this.simulation.current_generation();
-    }
-
-    previous_fitness(): number {
-        return this.simulation.previous_fitness();
-    }
+    average_fitness = (): number => this.simulation.average_fitness();
 
     redraw(canvasContext: CanvasRenderingContext2D, viewportHeight: number, viewportWidth: number) {
         canvasContext.clearRect(0, 0, viewportWidth, viewportHeight);
@@ -32,7 +33,8 @@ export class SimDrawer {
                 canvasContext,
                 food.x * viewportWidth,
                 food.y * viewportHeight,
-                (0.01 / 2.0) * viewportWidth
+                (0.01 / 2.0) * viewportWidth,
+                this.food_color
             );
         }
 
@@ -42,7 +44,8 @@ export class SimDrawer {
                 animal.x * viewportWidth,
                 animal.y * viewportHeight,
                 0.01 * viewportWidth,
-                animal.rotation
+                animal.rotation,
+                this.bird_color
             );
         }
 
@@ -50,7 +53,8 @@ export class SimDrawer {
 
 }
 
-function drawTriangle(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number) {
+// birds
+function drawTriangle(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number, color: string) {
     ctx.beginPath();
 
     ctx.moveTo(
@@ -74,12 +78,12 @@ function drawTriangle(ctx: CanvasRenderingContext2D, x: number, y: number, size:
         y + Math.sin(rotation) * size * 1.5,
     );
 
-    ctx.strokeStyle = 'rgb(255, 255, 255)'; // A nice white color
+    ctx.strokeStyle = color; // A nice white color
     ctx.stroke();
 
 };
 
-function drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) {
+function drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string) {
     ctx.beginPath();
 
     // ---
@@ -93,6 +97,6 @@ function drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, radius:
     // | only half of a circle, Pac-Man style.
     // ---
 
-    ctx.fillStyle = 'rgb(0, 255, 128)'; // A nice green color
+    ctx.fillStyle = color; // A nice green color
     ctx.fill();
 };

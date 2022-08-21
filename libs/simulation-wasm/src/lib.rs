@@ -6,6 +6,9 @@ use rand::prelude::ThreadRng;
 mod timer;
 use timer::Timer;
 
+pub mod observer;
+use observer::*;
+
 use lib_simulation as sim;
 use rand::prelude::*;
 use serde::Serialize;
@@ -17,16 +20,26 @@ pub struct Simulation {
     sim: sim::Simulation,
 }
 
+#[wasm_bindgen(start)]
+pub fn js_init() {
+    wasm_logger::init(wasm_logger::Config::new(log::Level::Info));
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+}
+
 #[wasm_bindgen]
 impl Simulation {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Self {
-        // let _ = Timer::new("Simulation::new");
-        wasm_logger::init(wasm_logger::Config::new(log::Level::Warn));
-        std::panic::set_hook(Box::new(console_error_panic_hook::hook));
-
+    pub fn new(generation_id: String, fitness_id: String) -> Self {
+        let _ = Timer::new("Simulation::new");
         let mut rng = thread_rng();
-        let sim = sim::Simulation::random(&mut rng);
+        let generation_observer = GenerationObserver::new(generation_id.to_owned());
+        let sim = sim::Simulation::random(
+            &mut rng,
+            Box::new(FitnessObserver::new(
+                fitness_id.to_owned(),
+                generation_observer,
+            )),
+        );
         Self { rng, sim }
     }
 
@@ -39,21 +52,11 @@ impl Simulation {
         self.sim.age
     }
 
-    pub fn current_generation(&self) -> usize {
-        self.sim.current_generation
-    }
-
     pub fn average_fitness(&self) -> f32 {
         self.sim.average_fitness()
     }
 
-    pub fn previous_fitness(&self) -> f32 {
-        self.sim.previous_fitness
-    }
-
-
     pub fn step(&mut self) {
-        // let _ = Timer::new("Simulation::step");
         self.sim.step(&mut self.rng)
     }
 }
@@ -109,12 +112,14 @@ impl From<&sim::food::Food> for Food {
 
 #[cfg(test)]
 mod tests {
+    wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
+
     use super::Simulation;
     use wasm_bindgen_test::wasm_bindgen_test;
 
     #[wasm_bindgen_test]
     fn stress_test() {
-        let mut simulation = Simulation::new();
+        let mut simulation = Simulation::new("a".to_owned(), "b".to_owned());
         (0..10_000).for_each(|_| simulation.step());
     }
 }

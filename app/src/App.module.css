@@ -1,4 +1,6 @@
-.age {}
+#ensure-cssload-0 {
+  ignored-property: 'computed';
+}
 
 .animation {
   height: 100%;
@@ -9,6 +11,10 @@
   background: #1f2639;
   color: rgb(193, 197, 189);
   height: 95vh;
+}
+
+.bird {
+  outline-color: rgb(255, 255, 255);
 }
 
 .content_col {
@@ -27,6 +33,10 @@
   padding-left: 2rem;
 }
 
+.food {
+  outline-color: rgb(0, 255, 128);
+}
+
 .title {
   padding-left: 5rem;
 }
@@ -39,6 +49,10 @@
   padding-left: 10%;
 }
 
+.table_label {
+  text-align: right;
+}
+
 a {
   color: rgb(84, 177, 177);
 }
@@ -46,3 +60,4 @@ a {
 td {
   padding: 0 15px;
 }
+

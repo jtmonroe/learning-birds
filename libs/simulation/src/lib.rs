@@ -5,6 +5,13 @@ use rand::{Rng, RngCore};
 use std::f32::consts::FRAC_PI_2;
 use std::ops::Div;
 
+/// Delink the state changes from the underlying code.
+/// Allow the Observers to mutate without hard linkages
+pub trait Observer<T: Clone> {
+    fn set(&mut self, t: T) -> bool;
+    fn get(&self) -> T;
+}
+
 pub mod animal;
 mod animal_individual;
 mod brain;
@@ -28,17 +35,18 @@ const GENERATION_LENGTH: usize = 1000;
 
 pub struct Simulation {
     world: World,
-    genetic_algorithm: ga::GeneticAlgorithm<RouletteWheelSelection, UniformCrossover, GaussianMutation>,
+    genetic_algorithm:
+        ga::GeneticAlgorithm<RouletteWheelSelection, UniformCrossover, GaussianMutation>,
     pub age: usize,
     pub generation_length: usize,
-    pub current_generation: usize,
-    pub previous_fitness: f32
+    pub fitness_observer: Box<dyn Observer<f32>>,
 }
 
 const EPSILON: f32 = 0.01;
 
 impl Simulation {
-    pub fn random(rng: &mut dyn RngCore) -> Self {
+    pub fn random(rng: &mut dyn RngCore, fitness_observer: Box<dyn Observer<f32>>) -> Self {
+        info!("new random simulation");
         let ga = ga::GeneticAlgorithm::new(
             RouletteWheelSelection::default(),
             UniformCrossover::default(),
@@ -50,8 +58,7 @@ impl Simulation {
             genetic_algorithm: ga,
             age: 0,
             generation_length: GENERATION_LENGTH,
-            current_generation: 0,
-            previous_fitness: 0.0
+            fitness_observer,
         }
     }
 
@@ -84,9 +91,9 @@ impl Simulation {
     }
 
     fn evolve(&mut self, rng: &mut dyn RngCore) {
+        info!("stepping forward a generation");
         self.age = 0;
-        self.current_generation += 1;
-        self.previous_fitness = self.average_fitness();
+        self.fitness_observer.set(self.average_fitness());
 
         let current_population: Vec<_> = self
             .world

@@ -1,5 +1,7 @@
 # Learning Birds
 
+![screenshot](res/app-screenshot.png)
+
 ## Description
 A simple genetic algorithm woven together with a neural network based upon a [tutorial](https://pwy.io/en/posts/learning-to-fly-pt1/) by [Patryk27](https://github.com/Patryk27/shorelark). Some major changes were made, including changing the backend neural network implementation to matrix designs and rebuilding the frontend in SolidJS.
 

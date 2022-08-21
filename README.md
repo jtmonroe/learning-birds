@@ -15,6 +15,8 @@ A simple genetic algorithm woven together with a neural network based upon a [tu
 Assuming you have the cargo toolchain installed and wasm-pack, running `npm run build` from the `./app` directory will build the project. Using `npm start` will bring the project up on `localhost:3000`. 
 
 ## TODO:
+- [ ] Add RustDocs
 - [ ] Integrate Rayon throw wasm-bindgen-rayon
 - [ ] Add more tests to Rust and Typescript code
 - [x] Handle resize event
+- [ ] Refactor observers on the front-end to own their elements

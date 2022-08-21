@@ -8,7 +8,7 @@ export interface RenderSimProps {
 };
 
 // TBH This function is a TERRIBLE plan and very brittle
-function getStyleAttribute(object_id: string, style_id: string): string {
+function getStyleAttribute(object_id: string, style_id: string): string | null {
     for (const sheet of document.styleSheets) {
         for (const rule of sheet.cssRules) {
             const styleRule = rule as CSSStyleRule;
@@ -17,44 +17,54 @@ function getStyleAttribute(object_id: string, style_id: string): string {
             }
         }
     }
-    return ""
+    return null
 }
 
 
 export const RenderSim = (props: RenderSimProps) => {
     const [isBird, _] = createSignal(true);
 
-    getStyleAttribute(styles.bird, "outline-color")
     const simDrawer = new SimDrawer(
         props.previous_fitness_id,
         props.generation_id,
-        getStyleAttribute(styles.bird, "outline-color"),
-        getStyleAttribute(styles.food, "outline-color"),
+        getStyleAttribute(styles.bird, "outline-color") ?? "rgb(0, 0, 0)",
+        getStyleAttribute(styles.food, "outline-color") ?? "rgb(0, 0, 0)",
     );
 
     let canvasRef: HTMLCanvasElement | undefined = undefined;
     let frame: number;
 
-    const draw = (_: number) => {
+    const draw = (height: number, width: number) => {
         const ctx = canvasRef?.getContext('2d') ?? null;
 
         if (ctx && canvasRef && isBird()) {
-            simDrawer.redraw(ctx, canvasRef.height, canvasRef.width);
-            frame = requestAnimationFrame(draw);
+            simDrawer.redraw(ctx, height, width);
+            frame = requestAnimationFrame(() => { draw(height, width) });
         }
     };
 
-    onMount(() => {
+    function draw_frame() {
         const viewportScale = window.devicePixelRatio || 1;
         canvasRef!.width = canvasRef!.clientWidth * viewportScale;
         canvasRef!.height = canvasRef!.clientHeight * viewportScale;
 
-        frame = requestAnimationFrame(draw);
-        onCleanup(() => cancelAnimationFrame(frame));
+        frame = requestAnimationFrame(() => { draw(canvasRef!.height, canvasRef!.width) });
+    }
+
+    onMount(() => {
+        draw_frame();
     });
 
+    const onResize = (_: Event) => {
+        cancelAnimationFrame(frame);
+        draw_frame();
+    }
 
-    const Age = () => { // not-reactive, constant update
+    onCleanup(() => cancelAnimationFrame(frame))
+
+    window.addEventListener('resize', onResize);
+
+    const Age = () => { // not-reactive, constant update element
         const [age, setAge] = createSignal(0);
         const interval = setInterval(
             () => setAge(simDrawer.age())
@@ -63,7 +73,7 @@ export const RenderSim = (props: RenderSimProps) => {
         return <div>{age()}</div>;
     }
 
-    const Fitness = () => { // not reactive, constant update
+    const Fitness = () => { // not reactive, constant update element
         const [fitness, setFitness] = createSignal(0);
         const interval = setInterval(
             () => setFitness(simDrawer.average_fitness()),

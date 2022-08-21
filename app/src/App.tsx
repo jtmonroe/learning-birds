@@ -7,9 +7,9 @@ import { RenderSim, RenderSimProps } from './RenderSim';
 
 const App: Component = () => {
   const ids: RenderSimProps = {
-    generation_id: 'a',
-    previous_fitness_id: 'b'
-  }
+    generation_id: 'generation_stat',
+    previous_fitness_id: 'previous_fitness_stat'
+  };
 
   return (
     <div class={styles.App}>

@@ -17,3 +17,4 @@ Assuming you have the cargo toolchain installed and wasm-pack, running `npm run 
 ## TODO:
 - [ ] Integrate Rayon throw wasm-bindgen-rayon
 - [ ] Add more tests to Rust and Typescript code
+- [x] Handle resize event

@@ -20,3 +20,4 @@ Assuming you have the cargo toolchain installed and wasm-pack, running `npm run 
 - [ ] Add more tests to Rust and Typescript code
 - [x] Handle resize event
 - [ ] Refactor observers on the front-end to own their elements
+- [ ] Swap to Yew for testing

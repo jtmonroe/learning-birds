@@ -14,5 +14,8 @@
     "rust-analyzer.diagnostics.disabled": [
         "unresolved-proc-macro",
         "missing-unsafe"
-    ]
+    ],
+    "emmet.includeLanguages": {
+        "rust": "html",
+    }
 }

@@ -26,6 +26,12 @@ pub fn js_init() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 }
 
+impl Simulation {
+    pub fn raw_world(&self) -> World {
+        self.sim.world().into()
+    }
+}
+
 #[wasm_bindgen]
 impl Simulation {
     #[wasm_bindgen(constructor)]
@@ -42,6 +48,8 @@ impl Simulation {
         );
         Self { rng, sim }
     }
+
+
 
     pub fn world(&self) -> JsValue {
         let world = World::from(self.sim.world());

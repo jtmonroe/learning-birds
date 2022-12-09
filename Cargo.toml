@@ -23,5 +23,6 @@ features = [
   "Element",
   "HtmlFormElement",
   "FormData",
-  "HtmlCanvasElement"
+  "HtmlCanvasElement",
+  "CanvasRenderingContext2d"
 ]

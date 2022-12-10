@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use log::info;
-use simulation_wasm::timer;
+// use simulation_wasm::timer;
 use simulation_wasm::Simulation;
 use simulation_wasm::World;
 use wasm_bindgen::prelude::*;
@@ -33,12 +33,6 @@ pub struct SimElement {
 #[derive(PartialEq, Clone)]
 pub struct Colour(String);
 
-impl From<&str> for Colour {
-    fn from(value: &str) -> Self {
-        Self(value.to_owned())
-    }
-}
-
 impl Component for SimElement {
     type Message = ();
     type Properties = SimCanvasInfo;
@@ -62,11 +56,10 @@ impl Component for SimElement {
     }
 
     fn rendered(&mut self, _ctx: &yew::Context<Self>, first_render: bool) {
-        info!("render");
+        info!("rendered");
         if !first_render {
             return;
         }
-        self.update(_ctx, ());
         let scale = window().unwrap().device_pixel_ratio();
         let canvas: HtmlCanvasElement = self.node_ref.cast().unwrap();
 
@@ -102,7 +95,6 @@ impl SimElement {
     }
 
     fn render(&mut self, canvas_ctx: CanvasContext) -> Result<(), JsValue> {
-        // timer::Timer::new("render fun");
         Self::draw_frame(
             &self.simulation.borrow().raw_world(),
             &canvas_ctx,
@@ -119,7 +111,7 @@ impl SimElement {
             let sim = self.simulation.clone();
             let dim = self.size.clone();
             move || {
-                // timer::Timer::new("render loop");
+
 
                 let mut borrowed_sim = sim.borrow_mut();
                 borrowed_sim.step();

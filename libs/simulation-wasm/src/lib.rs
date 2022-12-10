@@ -3,65 +3,32 @@ extern crate web_sys;
 
 use rand::prelude::ThreadRng;
 
-mod timer;
-use timer::Timer;
+pub mod timer;
 
 pub mod observer;
 use observer::*;
 
 use lib_simulation as sim;
 use rand::prelude::*;
-use serde::Serialize;
-use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
 pub struct Simulation {
     rng: ThreadRng,
     sim: sim::Simulation,
 }
 
-#[wasm_bindgen(start)]
-pub fn js_init() {
-    wasm_logger::init(wasm_logger::Config::new(log::Level::Info));
-    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
-}
-
 impl Simulation {
-    pub fn raw_world(&self) -> World {
-        self.sim.world().into()
-    }
-}
-
-#[wasm_bindgen]
-impl Simulation {
-    #[wasm_bindgen(constructor)]
-    pub fn new(generation_id: String, fitness_id: String) -> Self {
-        let _ = Timer::new("Simulation::new");
+    pub fn new(animals: usize, foods: usize) -> Self {
         let mut rng = thread_rng();
-        let generation_observer = GenerationObserver::new(generation_id.to_owned());
-        let sim = sim::Simulation::random(
-            &mut rng,
-            Box::new(FitnessObserver::new(
-                fitness_id.to_owned(),
-                generation_observer,
-            )),
-        );
+        let sim = sim::Simulation::random(&mut rng, animals, foods);
         Self { rng, sim }
     }
 
-
-
-    pub fn world(&self) -> JsValue {
-        let world = World::from(self.sim.world());
-        JsValue::from_serde(&world).expect("failed to serialize world")
+    pub fn raw_world(&self) -> World {
+        self.sim.world().into()
     }
 
     pub fn age(&self) -> usize {
         self.sim.age
-    }
-
-    pub fn average_fitness(&self) -> f32 {
-        self.sim.average_fitness()
     }
 
     pub fn step(&mut self) {
@@ -69,13 +36,13 @@ impl Simulation {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug)]
 pub struct World {
     pub animals: Vec<Animal>,
     pub food: Vec<Food>,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug)]
 pub struct Animal {
     pub x: f32,
     pub y: f32,
@@ -102,7 +69,7 @@ impl From<&sim::animal::Animal> for Animal {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug)]
 pub struct Food {
     pub x: f32,
     pub y: f32,
@@ -115,19 +82,5 @@ impl From<&sim::food::Food> for Food {
             x: food_position.x,
             y: food_position.y,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
-
-    use super::Simulation;
-    use wasm_bindgen_test::wasm_bindgen_test;
-
-    #[wasm_bindgen_test]
-    fn stress_test() {
-        let mut simulation = Simulation::new("a".to_owned(), "b".to_owned());
-        (0..10_000).for_each(|_| simulation.step());
     }
 }

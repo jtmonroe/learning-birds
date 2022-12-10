@@ -1,6 +1,6 @@
 use web_sys::console;
 
-pub (crate) struct Timer<'a> {
+pub struct Timer<'a> {
     name: &'a str,
 }
 

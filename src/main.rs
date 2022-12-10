@@ -1,32 +1,25 @@
 use yew::prelude::*;
 mod render;
 
+use render::*;
+
 #[function_component]
 fn App() -> Html {
-    let counter = use_state(|| 0);
-    let onclick = {
-        let counter = counter.clone();
-        move |_| {
-            let value = *counter + 1;
-            counter.set(value);
-        }
+    let props = SimCanvasInfo {
+        dim: (10.0, 10.0),
+        bird_colour: "blue".to_string(),
+        food_colour: "black".to_string(),
     };
 
-    // let canvas = yew::prelude::AnimationEvent::new(type_)
-
-    let x = html! {
+    html! {
         <>
             <h1> { "TITLE" } </h1>
-            <div>
-                <button {onclick}>{ "+1" }</button>
-                <p>{ *counter }</p>
-            </div>
+            <SimElement ..props.clone() />
         </>
-    };
-
-    x
+    }
 }
 
 fn main() {
+    wasm_logger::init(wasm_logger::Config::new(log::Level::Info));
     yew::Renderer::<App>::new().render();
 }

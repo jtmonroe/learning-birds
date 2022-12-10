@@ -8,7 +8,7 @@ use std::ops::Div;
 /// Delink the state changes from the underlying code.
 /// Allow the Observers to mutate without hard linkages
 pub trait Observer<T: Clone> {
-    fn set(&mut self, t: T) -> bool;
+    fn set(&mut self, new_value: T) -> bool;
     fn get(&self) -> T;
 }
 
@@ -39,13 +39,12 @@ pub struct Simulation {
         ga::GeneticAlgorithm<RouletteWheelSelection, UniformCrossover, GaussianMutation>,
     pub age: usize,
     pub generation_length: usize,
-    pub fitness_observer: Box<dyn Observer<f32>>,
 }
 
 const EPSILON: f32 = 0.01;
 
 impl Simulation {
-    pub fn random(rng: &mut dyn RngCore, fitness_observer: Box<dyn Observer<f32>>) -> Self {
+    pub fn random(rng: &mut dyn RngCore, animals: usize, foods: usize) -> Self {
         info!("new random simulation");
         let ga = ga::GeneticAlgorithm::new(
             RouletteWheelSelection::default(),
@@ -54,11 +53,10 @@ impl Simulation {
         );
 
         Self {
-            world: World::random(rng),
+            world: World::random(rng, animals, foods),
             genetic_algorithm: ga,
             age: 0,
             generation_length: GENERATION_LENGTH,
-            fitness_observer,
         }
     }
 
@@ -93,7 +91,6 @@ impl Simulation {
     fn evolve(&mut self, rng: &mut dyn RngCore) {
         info!("stepping forward a generation");
         self.age = 0;
-        self.fitness_observer.set(self.average_fitness());
 
         let current_population: Vec<_> = self
             .world

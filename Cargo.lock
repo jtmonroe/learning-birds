@@ -267,8 +267,10 @@ name = "genetic_nn"
 version = "0.1.0"
 dependencies = [
  "limelight-yew",
+ "log",
  "simulation-wasm",
  "wasm-bindgen",
+ "wasm-logger",
  "web-sys",
  "yew 0.20.0",
 ]

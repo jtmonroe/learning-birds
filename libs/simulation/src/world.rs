@@ -10,10 +10,10 @@ pub struct World {
 // TODO: Add parameters for the number of animals and foods
 // TODO: 100% coverage
 impl World {
-    pub fn random(rng: &mut dyn RngCore) -> Self {
-        let animals = (0..40).map(|_| Animal::random(rng)).collect();
+    pub fn random(rng: &mut dyn RngCore, animals: usize, foods: usize) -> Self {
+        let animals = (0..animals).map(|_| Animal::random(rng)).collect();
 
-        let foods = (0..60).map(|_| Food::random(rng)).collect();
+        let foods = (0..foods).map(|_| Food::random(rng)).collect();
         Self { animals, foods }
     }
 

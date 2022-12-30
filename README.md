@@ -11,12 +11,13 @@ A simple genetic algorithm woven together with a neural network based upon a [tu
 - [Cargo Trunk](https://trunkrs.dev/) to serve the yew site on the front-end.
 
 ## Usage
-Assuming you have the cargo toolchain installed and wasm-pack, running `npm run build` from the `./app` directory will build the project. Using `npm start` will bring the project up on `localhost:3000`. 
+Once `Trunk` is installed, call `trunk serve` from the command line and check out [localhost:8080/].
 
 ## TODO:
 - [ ] Add RustDocs
 - [ ] Integrate Rayon throw wasm-bindgen-rayon
-- [ ] Add more tests to Rust and Typescript code
+- [ ] Add more tests to Rust code
 - [x] Handle resize event
 - [ ] Refactor observers on the front-end to own their elements
 - [x] Swap to Yew for testing
+- [ ] [Stylist](https://crates.io/crates/stylist) for CSS

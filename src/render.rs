@@ -3,8 +3,9 @@ use std::rc::Rc;
 
 use log::info;
 // use simulation_wasm::timer;
-use simulation_wasm::Simulation;
-use simulation_wasm::World;
+use lib_simulation::Simulation;
+use lib_simulation::world::World;
+use rand::rngs::ThreadRng;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::window;
@@ -26,6 +27,7 @@ pub struct SimElement {
     node_ref: NodeRef,
     size: (f64, f64),
     simulation: Rc<RefCell<Simulation>>,
+    rng: ThreadRng,
     bird_colour: Colour,
     food_colour: Colour,
 }
@@ -39,11 +41,13 @@ impl Component for SimElement {
 
     fn create(ctx: &yew::Context<Self>) -> Self {
         let info = ctx.props();
-        let simulation = Simulation::new(40, 60);
+        let mut rng = rand::thread_rng();
+        let simulation = Simulation::random(&mut rng, 40, 60);
         Self {
             node_ref: NodeRef::default(),
             size: info.dim,
             simulation: Rc::new(RefCell::new(simulation)),
+            rng,
             bird_colour: Colour(info.bird_colour.clone()),
             food_colour: Colour(info.food_colour.clone()),
         }
@@ -96,7 +100,7 @@ impl SimElement {
 
     fn render(&mut self, canvas_ctx: CanvasContext) -> Result<(), JsValue> {
         Self::draw_frame(
-            &self.simulation.borrow().raw_world(),
+            &self.simulation.borrow().world(),
             &canvas_ctx,
             self.size,
             &self.bird_colour,
@@ -110,12 +114,13 @@ impl SimElement {
             let cb = cb.clone();
             let sim = self.simulation.clone();
             let dim = self.size.clone();
+            let mut rng = self.rng.clone();
             move || {
 
 
                 let mut borrowed_sim = sim.borrow_mut();
-                borrowed_sim.step();
-                let world = borrowed_sim.raw_world();
+                borrowed_sim.step(&mut rng);
+                let world = borrowed_sim.world();
 
                 Self::draw_frame(&world, &canvas_ctx, dim, &b_c, &f_c)
                     .expect("unreachable?");
@@ -136,23 +141,25 @@ impl SimElement {
     ) -> Result<(), JsValue> {
         canvas_ctx.clear_rect(0.0, 0.0, width, height);
 
-        for food in &world.food {
+        for food in world.foods() {
+            let pos = food.position();
             draw_circle(
                 canvas_ctx,
-                food.x as f64 * width,
-                food.y as f64 * height,
+                pos.x as f64 * width,
+                pos.y as f64 * height,
                 (0.01 / 2.0) * width,
                 food_colour,
             )?;
         }
 
-        for animal in &world.animals {
+        for animal in world.animals() {
+            let pos = animal.position();
             draw_triangle(
                 canvas_ctx,
-                animal.x as f64 * width,
-                animal.y as f64 * height,
+                pos.x as f64 * width,
+                pos.y as f64 * height,
                 0.01 * width,
-                animal.rotation as f64,
+                animal.rotation().angle() as f64,
                 bird_colour,
             )?;
         }

@@ -13,8 +13,9 @@ fn App() -> Html {
 
     html! {
         <>
-            <h1> { "TITLE" } </h1>
-            <SimElement ..props.clone() />
+            <div>
+                <div> <SimElement ..props.clone() /> </div>
+            </div>
         </>
     }
 }
